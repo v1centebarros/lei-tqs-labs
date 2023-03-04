@@ -54,6 +54,20 @@ public class CarController_WithMockServiceTest {
     }
 
     @Test
+     void whenGetCarById_thenReturnJsonCar() throws Exception {
+        Car car = new Car("Audi", "A3");
+
+        when(service.getCarDetails(Mockito.anyLong())).thenReturn(java.util.Optional.of(car));
+
+        mvc.perform(get("/api/cars/1")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.maker", is(car.getMaker())));
+
+        verify(service, times(1)).getCarDetails(Mockito.anyLong());
+    }
+
+    @Test
     void givenManyCars_whenGetCars_thenReturnJsonArray() throws Exception {
         Car car1 = new Car("Audi", "A3");
         Car car2 = new Car("BMW", "M3");

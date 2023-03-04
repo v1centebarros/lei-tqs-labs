@@ -49,6 +49,17 @@ public class CarRestControllerTemplateIT {
     }
 
     @Test
+    void whenGetCarById_thenReturnCar() {
+        Car bmw = new Car("BMW", "M2");
+        repository.saveAndFlush(bmw);
+
+        ResponseEntity<Car> response = restTemplate.getForEntity("/api/cars/" + bmw.getCarId(), Car.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(bmw);
+    }
+
+    @Test
     void givenCars_whenGetCars_thenStatus200() {
         createTestCar("BMW", "M2");
         createTestCar("Citroen", "C3");
