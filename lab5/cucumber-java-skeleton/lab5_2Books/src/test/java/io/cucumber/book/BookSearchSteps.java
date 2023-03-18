@@ -1,13 +1,16 @@
 package io.cucumber.book;
 
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -18,8 +21,8 @@ public class BookSearchSteps {
     List<Book> result = new ArrayList<>();
 
     @ParameterType("([0-9]{4})-([0-9]{2})-([0-9]{2})")
-    public LocalDateTime iso8601Date(String year, String month, String day){
-        return LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day),0, 0);
+    public LocalDateTime iso8601Date(String year, String month, String day) {
+        return LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), 0, 0);
     }
 
     @Given("a book with the title {string}, written by {string}, published in {iso8601Date}")
@@ -56,6 +59,26 @@ public class BookSearchSteps {
 
     @Then("{int} book should have been found")
     public void bookShouldHaveBeenFound(int arg0) {
+        assertThat(result.size(), equalTo(arg0));
+    }
+
+    @Given("I have the following books in the store by map")
+    public void iHaveTheFollowingBooksInTheStoreByMap(DataTable table) {
+
+        List<Map<String, String>> rows = table.asMaps(String.class, String.class);
+
+        for (Map<String, String> columns : rows) {
+            library.addBook(new Book(columns.get("title"), columns.get("author")));
+        }
+    }
+
+    @When("I search for books by author {string}")
+    public void iSearchForBooksByAuthor(String arg0) {
+        result = library.findBooksByAuthor(arg0);
+    }
+
+    @Then("I find {int} books")
+    public void iFindBooks(int arg0) {
         assertThat(result.size(), equalTo(arg0));
     }
 }

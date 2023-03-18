@@ -1,14 +1,20 @@
 package io.cucumber.book;
 import java.time.LocalDateTime;
 public class Book {
-    private String title;
-    private String author;
-    private LocalDateTime published;
+    private final String title;
+    private final String author;
+    private final LocalDateTime published;
 
     public Book(String title, String author, LocalDateTime published) {
         this.title = title;
         this.author = author;
         this.published = published;
+    }
+
+    public Book(String title, String author) {
+        this.title = title;
+        this.author = author;
+        this.published = LocalDateTime.now();
     }
 
     public String getTitle() {
@@ -23,7 +29,4 @@ public class Book {
         return published;
     }
 
-    public void setPublished(LocalDateTime published) {
-        this.published = published;
-    }
 }

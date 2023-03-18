@@ -17,3 +17,15 @@ Feature: Book search
     When the customer searches for books written by 'Tim Tomson'
     Then 1 book should have been found
     And Book 1 should have the title 'Some other book'
+
+  Scenario: Correct non-zero number of books found by author by map
+    Given I have the following books in the store by map
+      | title                 | author          |
+      | One good book         | Anonymous       |
+      | The Lord of the Rings | J.R.R. Tolkien  |
+      | Some other book       | Tim Tomson      |
+      | How to cook a dino    | Fred Flintstone |
+      | The Hobbit            | J.R.R. Tolkien  |
+
+    When I search for books by author 'J.R.R. Tolkien'
+    Then I find 2 books
