@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 
 import java.util.Objects;
 
-//TODO Fazer os testes pela ordem C->B->A->E
 @Entity
 @Table(name = "tqs_car")
 public class Car {

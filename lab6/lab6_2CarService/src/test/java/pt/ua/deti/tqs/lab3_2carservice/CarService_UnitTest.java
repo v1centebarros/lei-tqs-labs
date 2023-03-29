@@ -18,7 +18,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class CarService_UnitTest {
+class CarService_UnitTest {
 
     @Mock(lenient = true)
     private CarRepository carRepository;
@@ -46,7 +46,7 @@ public class CarService_UnitTest {
     void whenSearchValidId_thenCarShouldBeFound() {
         long id = 12L;
         Optional<Car> found = employeeService.getCarDetails(id);
-        assertThat(found.isPresent()).isEqualTo(true);
+        assertThat(found).isPresent();
         assertThat(found.get().getCarId()).isEqualTo(id);
         verifyFindByIdIsCalledOnce();
     }
@@ -55,7 +55,7 @@ public class CarService_UnitTest {
     void whenSearchInvalidId_thenCarShouldNotBeFound() {
         long id = -12L;
         Optional<Car> found = employeeService.getCarDetails(id);
-        assertThat(found.isPresent()).isEqualTo(false);
+        assertThat(found).isNotPresent();
         verifyFindByIdIsCalledOnce();
     }
 
