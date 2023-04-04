@@ -2,17 +2,17 @@ package pt.ua.deti.tqs;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pt.ua.deti.tqs.cache.LocalCache;
+import pt.ua.deti.tqs.cache.LocalVolatileCache;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CacheTest {
+class VolatileCacheTest {
 
-    private LocalCache<String, Integer> cache;
+    private LocalVolatileCache<String, Integer> cache;
 
     @BeforeEach
     void setUp() {
-        cache = new LocalCache<>();
+        cache = new LocalVolatileCache<>();
     }
 
     @Test

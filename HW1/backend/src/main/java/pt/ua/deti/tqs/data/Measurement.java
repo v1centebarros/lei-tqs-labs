@@ -1,5 +1,6 @@
 package pt.ua.deti.tqs.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.util.Objects;
@@ -11,6 +12,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class Measurement {
     private Double concentration;
+    @JsonIgnore
     private Integer aqi;
 
 
