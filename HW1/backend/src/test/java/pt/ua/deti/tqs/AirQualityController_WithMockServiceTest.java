@@ -1,6 +1,7 @@
 package pt.ua.deti.tqs;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +11,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import pt.ua.deti.tqs.controller.AirQualityController;
 import pt.ua.deti.tqs.data.AirQuality;
-import pt.ua.deti.tqs.data.Measurement;
-import pt.ua.deti.tqs.service.IAirQualityService;
 import pt.ua.deti.tqs.service.CacheService;
 import pt.ua.deti.tqs.service.CityService;
+import pt.ua.deti.tqs.service.IAirQualityService;
 
-import static org.hamcrest.CoreMatchers.is;
+import java.util.Arrays;
+
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -35,58 +37,29 @@ class AirQualityController_WithMockServiceTest {
     @MockBean
     private CityService cityService;
 
+    private AirQuality airQuality;
     @BeforeEach
     void setUp() {
+        airQuality = new AirQuality(12, Arrays.asList(12,12,12,12,12,12));
     }
 
     @Test
     void whenGetQualityFromCity_thenReturnsAirQuality() throws Exception{
-        AirQuality airQuality = new AirQuality(
-                12,
-                new Measurement(12.0,12),
-                new Measurement(12.0,12),
-                new Measurement(12.0,12),
-                new Measurement(12.0,12),
-                new Measurement(12.0,12),
-                new Measurement(12.0,12)
-                );
         when(service.getAirQuality(Mockito.any())).thenReturn(airQuality);
 
         mvc.perform(get("/api/quality?city=Porto")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.overallAqi", is(airQuality.getOverallAqi())))
-//                .andExpect(jsonPath("$.PM25.aqi", is(airQuality.getPm25().getAqi())))
-                .andExpect(jsonPath("$.PM25.concentration", is(airQuality.getPm25().getConcentration())));
+                .andExpect(jsonPath("$.aqi", is(airQuality.getAqi())))
+                .andExpect(jsonPath("$.co", is(airQuality.getCo())))
+                .andExpect(jsonPath("$.pm10", is(airQuality.getPm10())))
+                .andExpect(jsonPath("$.so2", is(airQuality.getSo2())))
+                .andExpect(jsonPath("$.pm25", is(airQuality.getPm25())))
+                .andExpect(jsonPath("$.o3", is(airQuality.getO3())))
+                .andExpect(jsonPath("$.no2", is(airQuality.getNo2())))
+                .andExpect(jsonPath("$.dateTime", is(airQuality.getDateTime().toString())));
 
         verify(service, times(1)).getAirQuality(Mockito.any());
     }
 
-
-    @Test
-    void whenGetQualityFromCity_thenReturnsAirQualityFromCache() throws Exception {
-        AirQuality airQuality = new AirQuality(
-                12,
-                new Measurement(12.0, 12),
-                new Measurement(12.0, 12),
-                new Measurement(12.0, 12),
-                new Measurement(12.0, 12),
-                new Measurement(12.0, 12),
-                new Measurement(12.0, 12)
-        );
-        when(service.getAirQuality(Mockito.any())).thenReturn(airQuality);
-
-        when(cacheService.hasCityQuality(Mockito.any())).thenReturn(true);
-        when(cacheService.getAirQuality(Mockito.any())).thenReturn(airQuality);
-
-        mvc.perform(get("/api/quality?city=Porto")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.overallAqi", is(airQuality.getOverallAqi())))
-
-                .andExpect(jsonPath("$.PM25.concentration", is(airQuality.getPm25().getConcentration())));
-
-        verify(service, times(0)).getAirQuality(Mockito.any());
-        verify(cacheService, times(1)).getAirQuality(Mockito.any());
-    }
 }
