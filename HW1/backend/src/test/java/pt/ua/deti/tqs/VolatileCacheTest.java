@@ -31,7 +31,7 @@ class VolatileCacheTest {
     }
 
     @Test
-    void testGetWithExpiredEntry() throws InterruptedException {
+    void testGetWithExpiredEntry() {
         cache.put("key", 1234, 1);
         //TODO: Rever isto
         await().atMost(10, TimeUnit.SECONDS).until(() -> cache.get("key") == null);
@@ -52,7 +52,7 @@ class VolatileCacheTest {
     }
 
     @Test
-    void testGetCacheWithExpiredEntry() throws InterruptedException {
+    void testGetCacheWithExpiredEntry() {
         cache.put("key1", 1234, 1);
         cache.put("key2", 5678, 10);
 //        Thread.sleep(3000);

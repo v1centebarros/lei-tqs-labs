@@ -8,9 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import pt.ua.deti.tqs.data.City;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -59,14 +57,5 @@ public class CityService {
         log.info("Caching {} current data", cityData);
         cities.put(city, cityData);
         return cityData;
-    }
-
-    public List<Number> getCityCoordinates(String city) {
-        City cityData = getCity(city);
-        if (cityData == null) {
-            return Collections.emptyList();
-        }
-        return cityData.getCoordinates();
-
     }
 }
