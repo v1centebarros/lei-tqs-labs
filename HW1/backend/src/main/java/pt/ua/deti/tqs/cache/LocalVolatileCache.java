@@ -59,10 +59,10 @@ public class LocalVolatileCache<K, V> implements ILocalCache<K, V>{
                     e.printStackTrace();
                     Thread.currentThread().interrupt();
                 }
-                for (K key : cache.keySet()) {
-                    CacheEntry<V> entry = cache.get(key);
-                    if (entry != null && entry.isExpired()) {
-                        cache.remove(key);
+
+                for (Map.Entry<K, CacheEntry<V>> entry : cache.entrySet()) {
+                    if (entry.getValue().isExpired()) {
+                        cache.remove(entry.getKey());
                     }
                 }
             }

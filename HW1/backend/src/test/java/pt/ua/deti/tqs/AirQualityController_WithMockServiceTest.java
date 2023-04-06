@@ -11,7 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import pt.ua.deti.tqs.controller.AirQualityController;
 import pt.ua.deti.tqs.data.AirQuality;
 import pt.ua.deti.tqs.data.Measurement;
-import pt.ua.deti.tqs.service.AirQualityService;
+import pt.ua.deti.tqs.service.IAirQualityService;
 import pt.ua.deti.tqs.service.CacheService;
 import pt.ua.deti.tqs.service.CityService;
 
@@ -27,7 +27,7 @@ class AirQualityController_WithMockServiceTest {
     private MockMvc mvc;
 
     @MockBean
-    private AirQualityService service;
+    private IAirQualityService service;
 
     @MockBean
     private CacheService cacheService;
