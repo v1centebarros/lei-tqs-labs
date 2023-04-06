@@ -10,6 +10,8 @@ import pt.ua.deti.tqs.data.AirQuality;
 import reactor.core.publisher.Mono;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -91,7 +93,59 @@ public class AirQualityService implements IAirQualityService {
 
         Map<String,Number> measurements = JsonPath.read(requestResult, "$.list[0].components");
         Integer aqi = JsonPath.read(requestResult, "$.list[0].main.aqi");
-        return new AirQuality(aqi, measurements);
+        Integer dt = JsonPath.read(requestResult, "$.list[0].dt");
+        return new AirQuality(aqi, measurements, dt);
+    }
 
+
+    public List<AirQuality> getAirQualityForecast(String city) {
+
+        if (cacheService.hasCityForecast(city)) {
+            List<AirQuality> airQualityList = cacheService.getAirQualityForecast(city);
+            log.info("City found in cache {} with {}", city, airQualityList);
+            return airQualityList;
+        }
+
+        log.info("{} not found in cache retrieving from OpenWeather", city);
+        List<AirQuality> airQualityList = fetchAirQualityForecast(city);
+
+        if (airQualityList == null) {
+            log.error("Could not retrieve data for {}", city);
+            return Collections.emptyList();
+        }
+        log.info("City fetched from OpenWeather {} with {}", city, airQualityList);
+        log.info("Caching {} forecast data", airQualityList);
+        cacheService.addAirQualityForecast(city, airQualityList);
+        return airQualityList;
+    }
+
+    public List<AirQuality> fetchAirQualityForecast(String city) {
+        WebClient builder = WebClient.create("http://api.openweathermap.org/data/2.5/air_pollution/forecast");
+
+        List<Number> coordinates = cityService.getCityCoordinates(city);
+
+        Object requestResult = builder.get()
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("lat", coordinates.get(0))
+                        .queryParam("lon", coordinates.get(1))
+                        .queryParam("appid","7d32153711277ad313bf9e6b26a5eaca")
+                        .build())
+                .retrieve()
+                .bodyToMono(Object.class)
+                .onErrorResume(e -> Mono.empty()).block();
+
+        if (requestResult == null) return Collections.emptyList();
+
+       List<Map<String,Object>> temp = JsonPath.read(requestResult, "$.list[*]");
+
+       List <AirQuality> airQualityList = new ArrayList<>();
+       for (Map<String,Object> t : temp) {
+           Map<String,Number> measurements = JsonPath.read(t, "$.components");
+           Integer aqi = JsonPath.read(t, "$.main.aqi");
+           Integer dt = JsonPath.read(t, "$.dt");
+          airQualityList.add(new AirQuality(aqi, measurements, dt));
+       }
+
+        return airQualityList;
     }
 }

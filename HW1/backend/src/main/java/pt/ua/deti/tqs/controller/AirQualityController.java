@@ -23,6 +23,8 @@ public class AirQualityController {
     @Autowired
     private CityService cityService;
 
+    private static final String ERROR_MSG = "{\"error\": \"Could not find data\"}";
+
     @GetMapping("/quality")
     public ResponseEntity<Object> getQuality(@RequestParam(value = "city") String city) {
         AirQuality airQuality = airQualityService.getAirQuality(city.trim().toLowerCase());
@@ -30,7 +32,7 @@ public class AirQualityController {
         if (airQuality == null) {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(APPLICATION_JSON)
-                    .body("{\"error\": \"City not found\"}");
+                    .body(ERROR_MSG);
         }
 
         return ResponseEntity.ok(airQuality);
@@ -38,13 +40,33 @@ public class AirQualityController {
 
     @GetMapping("/city")
     public ResponseEntity<Object> getCity(@RequestParam(value = "city") String city) {
+        if (city == null) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(APPLICATION_JSON)
+                    .body(ERROR_MSG);
+        }
         return ResponseEntity.ok(cityService.getCity(city));
     }
 
 
     @GetMapping("/openweather")
-    public ResponseEntity<Object> getOpenWeather() {
-        return ResponseEntity.ok(airQualityService.getAirQualityOpenWeather(-8.5, 41.15));
+    public ResponseEntity<Object> getOpenWeather(@RequestParam(value = "lat") Double lat, @RequestParam(value = "lon") Double lon) {
+        if (lat == null || lon == null) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(APPLICATION_JSON)
+                    .body(ERROR_MSG);
+        }
+        return ResponseEntity.ok(airQualityService.getAirQualityOpenWeather(lat, lon));
+    }
+
+    @GetMapping("/forecast")
+    public ResponseEntity<Object> getForecast(@RequestParam(value = "city") String city) {
+        if (city == null) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(APPLICATION_JSON)
+                    .body(ERROR_MSG);
+        }
+        return ResponseEntity.ok(airQualityService.getAirQualityForecast(city));
     }
 
 }
