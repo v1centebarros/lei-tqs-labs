@@ -1,8 +1,8 @@
 package pt.ua.deti.tqs.service;
 
+import com.jayway.jsonpath.JsonPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import pt.ua.deti.tqs.data.City;
@@ -18,27 +18,30 @@ import java.util.Map;
 public class CityService {
 
     static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final String BASE_URL = "https://api.api-ninjas.com/v1/geocoding";
-    private static final String APP_ID = "LCLImpqPQixnfVWmCdeg1w==xfvZvOFvVmELIcXe";
+    private static final String BASE_URL = "https://geocode.maps.co/search";
+
     private final Map<String, City> cities = new HashMap<>();
 
     public City fetchCity(String city) {
         WebClient builder = WebClient.create(BASE_URL);
-
-        List<City> requestResult = builder.get()
+        Object requestResult = builder.get()
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("city", city)
                         .build())
-                .header("X-Api-Key", APP_ID)
                 .retrieve()
-                .toEntityList(City.class)
-                .mapNotNull(HttpEntity::getBody)
+                .bodyToMono(Object.class)
                 .onErrorResume(e -> Mono.empty()).block();
 
-        if (requestResult == null || requestResult.isEmpty()) {
-            return null;
-        }
-        return requestResult.get(0);
+
+        if (requestResult == null) return null;
+
+        String displayName = JsonPath.read(requestResult, "$.[0].display_name");
+        double lat = Double.parseDouble(JsonPath.read(requestResult, "$.[0].lat"));
+        double lon = Double.parseDouble(JsonPath.read(requestResult, "$.[0].lon"));
+
+        City c = new City(city, lat, lon, displayName);
+        log.info("City {} found with coordinates {}", city, c);
+        return c;
     }
 
     public City getCity(String city) {

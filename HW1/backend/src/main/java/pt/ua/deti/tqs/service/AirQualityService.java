@@ -79,8 +79,8 @@ public class AirQualityService implements IAirQualityService {
 
         Object requestResult = builder.get()
                 .uri(uriBuilder -> uriBuilder
-                        .queryParam("lat", "31.2047")
-                        .queryParam("lon", "121.449")
+                        .queryParam("lat", lat)
+                        .queryParam("lon", lon)
                         .queryParam("appid","7d32153711277ad313bf9e6b26a5eaca")
                         .build())
                 .retrieve()
