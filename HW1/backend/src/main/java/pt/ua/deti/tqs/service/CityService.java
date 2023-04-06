@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import pt.ua.deti.tqs.data.City;
-import reactor.core.publisher.Mono;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
@@ -29,11 +28,11 @@ public class CityService {
                         .queryParam("city", city)
                         .build())
                 .retrieve()
-                .bodyToMono(Object.class)
-                .onErrorResume(e -> Mono.empty()).block();
+                .bodyToMono(Object.class).block();
 
-
-        if (requestResult == null) return null;
+        if (requestResult != null && requestResult.toString().equals("[]")) {
+            return null;
+        }
 
         String displayName = JsonPath.read(requestResult, "$.[0].display_name");
         double lat = Double.parseDouble(JsonPath.read(requestResult, "$.[0].lat"));
@@ -45,12 +44,13 @@ public class CityService {
     }
 
     public City getCity(String city) {
+        city = city.trim().toLowerCase();
         log.info("Requesting city {} from Cache", city);
         if (cities.containsKey(city)) {
             return cities.get(city);
         }
 
-        log.info("{} not found in cache retrieving from NinjaAPI", city);
+        log.info("{} not found in cache retrieving from Geocode Maps", city);
         City cityData = fetchCity(city);
         if (cityData == null) {
             return null;

@@ -1,6 +1,10 @@
 package pt.ua.deti.tqs.cache;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -9,6 +13,8 @@ public class LocalVolatileCache<K, V> implements ILocalCache<K, V>{
 
     private final Map<K, CacheEntry<V>> cache;
     private static final int DEFAULT_TTL = 8;
+
+    private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 
     public LocalVolatileCache() {
@@ -56,7 +62,7 @@ public class LocalVolatileCache<K, V> implements ILocalCache<K, V>{
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.error("Cache cleanup thread interrupted");
                     Thread.currentThread().interrupt();
                 }
 

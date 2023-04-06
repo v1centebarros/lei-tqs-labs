@@ -2,14 +2,12 @@ package pt.ua.deti.tqs.data;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.util.List;
 import java.util.Objects;
 
 @Getter
 @Setter
-@ToString
 public class City {
     private String name;
     private Double latitude;
@@ -38,5 +36,10 @@ public class City {
 
     public List<Number> getCoordinates() {
         return List.of(latitude, longitude);
+    }
+
+    @Override
+    public String toString() {
+        return displayName + "(" + latitude + ", " + longitude + ")";
     }
 }

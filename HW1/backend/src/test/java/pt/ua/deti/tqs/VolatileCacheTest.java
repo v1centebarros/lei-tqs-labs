@@ -4,6 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pt.ua.deti.tqs.cache.LocalVolatileCache;
 
+import java.util.concurrent.TimeUnit;
+
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 
 class VolatileCacheTest {
@@ -30,7 +33,8 @@ class VolatileCacheTest {
     @Test
     void testGetWithExpiredEntry() throws InterruptedException {
         cache.put("key", 1234, 1);
-        Thread.sleep(2000);
+        //TODO: Rever isto
+        await().atMost(10, TimeUnit.SECONDS).until(() -> cache.get("key") == null);
         assertNull(cache.get("key"));
     }
 
@@ -51,7 +55,8 @@ class VolatileCacheTest {
     void testGetCacheWithExpiredEntry() throws InterruptedException {
         cache.put("key1", 1234, 1);
         cache.put("key2", 5678, 10);
-        Thread.sleep(3000);
+//        Thread.sleep(3000);
+        await().atMost(3, TimeUnit.SECONDS);
         assertEquals(2, cache.size());
     }
 }

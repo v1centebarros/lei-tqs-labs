@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import pt.ua.deti.tqs.data.AirQuality;
+import pt.ua.deti.tqs.data.City;
 import reactor.core.publisher.Mono;
 
 import java.lang.invoke.MethodHandles;
@@ -22,11 +23,8 @@ public class AirQualityService implements IAirQualityService {
     @Autowired
     private CacheService cacheService;
 
-    @Autowired
-    private CityService cityService;
-
     @Override
-    public AirQuality getAirQuality(String city) {
+    public AirQuality getAirQuality(City city) {
         AirQuality airQuality;
         log.info("Requesting city {} from Cache", city);
         if (cacheService.hasCityQuality(city)) {
@@ -36,12 +34,11 @@ public class AirQualityService implements IAirQualityService {
         }
 
         log.info("{} not found in cache retrieving from NinjaAPI", city);
-        airQuality = getAirQualityNinja(city);
+        airQuality = getAirQualityNinja(city.getName());
 
         if (airQuality == null) {
             log.info("{} not found in NinjaAPI retrieving from OpenWeather", city);
-            List<Number> coordinates = cityService.getCityCoordinates(city);
-            airQuality = getAirQualityOpenWeather(coordinates.get(0).doubleValue(), coordinates.get(1).doubleValue());
+            airQuality = getAirQualityOpenWeather(city.getLatitude(), city.getLongitude());
         }
 
         if (airQuality == null) {
@@ -98,7 +95,7 @@ public class AirQualityService implements IAirQualityService {
     }
 
 
-    public List<AirQuality> getAirQualityForecast(String city) {
+    public List<AirQuality> getAirQualityForecast(City city) {
 
         if (cacheService.hasCityForecast(city)) {
             List<AirQuality> airQualityList = cacheService.getAirQualityForecast(city);
@@ -119,15 +116,13 @@ public class AirQualityService implements IAirQualityService {
         return airQualityList;
     }
 
-    public List<AirQuality> fetchAirQualityForecast(String city) {
+    public List<AirQuality> fetchAirQualityForecast(City city) {
         WebClient builder = WebClient.create("http://api.openweathermap.org/data/2.5/air_pollution/forecast");
-
-        List<Number> coordinates = cityService.getCityCoordinates(city);
 
         Object requestResult = builder.get()
                 .uri(uriBuilder -> uriBuilder
-                        .queryParam("lat", coordinates.get(0))
-                        .queryParam("lon", coordinates.get(1))
+                        .queryParam("lat", city.getLatitude())
+                        .queryParam("lon", city.getLongitude())
                         .queryParam("appid","7d32153711277ad313bf9e6b26a5eaca")
                         .build())
                 .retrieve()

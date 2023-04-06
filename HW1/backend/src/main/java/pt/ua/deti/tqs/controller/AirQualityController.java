@@ -7,9 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pt.ua.deti.tqs.data.AirQuality;
+import pt.ua.deti.tqs.data.*;
 import pt.ua.deti.tqs.service.CityService;
 import pt.ua.deti.tqs.service.IAirQualityService;
+
+import java.util.Collections;
+import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -23,19 +26,49 @@ public class AirQualityController {
     @Autowired
     private CityService cityService;
 
-    private static final String ERROR_MSG = "{\"error\": \"Could not find data\"}";
-
     @GetMapping("/quality")
     public ResponseEntity<Object> getQuality(@RequestParam(value = "city") String city) {
-        AirQuality airQuality = airQualityService.getAirQuality(city.trim().toLowerCase());
+        City cityData = cityService.getCity(city);
 
+        if (cityData == null) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(APPLICATION_JSON)
+                    .body(new ErrorDTO("It was not possible to retrieve the city data"));
+        }
+
+        AirQuality airQuality = airQualityService.getAirQuality(cityData);
         if (airQuality == null) {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(APPLICATION_JSON)
-                    .body(ERROR_MSG);
+                    .body(new ErrorDTO("It was not possible to retrieve the air quality data"));
         }
 
-        return ResponseEntity.ok(airQuality);
+        return ResponseEntity.ok(new AirQualityDTO(cityData, airQuality));
+    }
+
+    @GetMapping("/forecast")
+    public ResponseEntity<Object> getForecast(@RequestParam(value = "city") String city) {
+        if (city == null) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(APPLICATION_JSON)
+                    .body(new ErrorDTO("City not found."));
+        }
+
+        City cityData = cityService.getCity(city);
+        if (cityData == null) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(APPLICATION_JSON)
+                    .body(new ErrorDTO("It was not possible to retrieve the city data"));
+        }
+        List<AirQuality> airQualityForecast = airQualityService.getAirQualityForecast(cityData);
+
+        if (airQualityForecast.equals(Collections.emptyList())){
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(APPLICATION_JSON)
+                    .body(new ErrorDTO("It was not possible to retrieve the forecast"));
+        }
+
+        return ResponseEntity.ok(new ForecastDTO(cityData, airQualityForecast));
     }
 
     @GetMapping("/city")
@@ -43,7 +76,7 @@ public class AirQualityController {
         if (city == null) {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(APPLICATION_JSON)
-                    .body(ERROR_MSG);
+                    .body(new ErrorDTO("City not found"));
         }
         return ResponseEntity.ok(cityService.getCity(city));
     }
@@ -54,19 +87,19 @@ public class AirQualityController {
         if (lat == null || lon == null) {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(APPLICATION_JSON)
-                    .body(ERROR_MSG);
+                    .body(new ErrorDTO("Invalid coordinates"));
         }
         return ResponseEntity.ok(airQualityService.getAirQualityOpenWeather(lat, lon));
     }
 
-    @GetMapping("/forecast")
-    public ResponseEntity<Object> getForecast(@RequestParam(value = "city") String city) {
+    @GetMapping("/ninja")
+    public ResponseEntity<Object> getNinja(@RequestParam(value = "city") String city) {
         if (city == null) {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(APPLICATION_JSON)
-                    .body(ERROR_MSG);
+                    .body(new ErrorDTO("City not found"));
         }
-        return ResponseEntity.ok(airQualityService.getAirQualityForecast(city));
+        return ResponseEntity.ok(airQualityService.getAirQualityNinja(city));
     }
 
 }
