@@ -14,30 +14,13 @@ public class City {
     private String name;
     private Double latitude;
     private Double longitude;
-    private String country;
+    private String displayName;
 
-    public City(String name, double latitude, double longitude, String country) {
+    public City(String name, double latitude, double longitude, String displayName) {
         this.name = name.toLowerCase();
         this.latitude = latitude;
         this.longitude = longitude;
-        this.country = country;
-    }
-
-    public City(String name, String country) {
-        this.name = name.toLowerCase();
-        this.country = country;
-    }
-
-    public City(String name) {
-        this.name = name.toLowerCase();
-    }
-
-    public City() {
-    }
-
-
-    public void setName(String name) {
-        this.name = name.toLowerCase();
+        this.displayName = displayName;
     }
 
     @Override
@@ -45,12 +28,12 @@ public class City {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         City city = (City) o;
-        return Double.compare(city.latitude, latitude) == 0 && Double.compare(city.longitude, longitude) == 0 && name.equals(city.name) && country.equals(city.country);
+        return Double.compare(city.latitude, latitude) == 0 && Double.compare(city.longitude, longitude) == 0 && name.equals(city.name) && displayName.equals(city.displayName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, latitude, longitude, country);
+        return Objects.hash(name, latitude, longitude, displayName);
     }
 
     public List<Number> getCoordinates() {
