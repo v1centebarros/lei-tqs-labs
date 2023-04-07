@@ -81,15 +81,19 @@ public class AirQualityController {
         return ResponseEntity.ok(cityService.getCity(city));
     }
 
-
     @GetMapping("/openweather")
-    public ResponseEntity<Object> getOpenWeather(@RequestParam(value = "lat") Double lat, @RequestParam(value = "lon") Double lon) {
-        if (lat == null || lon == null) {
+    public ResponseEntity<Object> getOpenWeather(@RequestParam(value = "city") String city) {
+        if (city == null) {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(APPLICATION_JSON)
-                    .body(new ErrorDTO("Invalid coordinates"));
+                    .body(new ErrorDTO("City not found"));
         }
-        return ResponseEntity.ok(airQualityService.getAirQualityOpenWeather(lat, lon));
+        City cityData = cityService.getCity(city);
+
+        AirQuality airQuality = airQualityService.getAirQualityOpenWeather(cityData.getLatitude(), cityData.getLongitude());
+
+
+        return ResponseEntity.ok(new AirQualityDTO(cityData, airQuality));
     }
 
     @GetMapping("/ninja")
@@ -99,6 +103,15 @@ public class AirQualityController {
                     .contentType(APPLICATION_JSON)
                     .body(new ErrorDTO("City not found"));
         }
-        return ResponseEntity.ok(airQualityService.getAirQualityNinja(city));
+
+        AirQuality airQuality = airQualityService.getAirQualityNinja(city);
+
+        if (airQuality == null) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(APPLICATION_JSON)
+                    .body(new ErrorDTO("It was not possible to retrieve the air quality data"));
+        }
+
+        return ResponseEntity.ok(new AirQualityDTO(cityService.getCity(city), airQuality));
     }
 }
