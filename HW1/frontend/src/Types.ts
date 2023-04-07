@@ -27,3 +27,18 @@ export type CurrentAirQuality = {
     city: City,
     data: AirQuality
 }
+
+export type Statistics = {
+    airQualityStats: {
+        hits: number,
+        misses: number,
+        puts: number,
+        requests: number
+    },
+    forecastCacheStats: {
+        hits: number,
+        misses: number,
+        puts: number,
+        requests: number
+    }
+}

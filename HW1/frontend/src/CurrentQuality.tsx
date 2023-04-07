@@ -4,7 +4,7 @@ import moment from "moment/moment";
 export function CurrentQuality(props: { airQuality: AirQuality }) {
     return (
         <>
-            <div className={"text-2xl font-bold"}>{moment(new Date(props.airQuality.dateTime)).format("MMMM Do YYYY, h:mm:ss a")}</div>
+            <div className={"text-2xl font-bold"}>{moment(new Date(props.airQuality.dateTime)).format("MMMM Do YYYY h:mm a")}</div>
             <div className="stats w-full stats-vertical lg:stats-horizontal shadow bg-neutral">
                 <div className="stat">
                     <div className="stat-title text-primary">Overall AQI</div>
