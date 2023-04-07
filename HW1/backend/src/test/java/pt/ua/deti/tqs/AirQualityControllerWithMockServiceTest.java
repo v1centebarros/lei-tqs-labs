@@ -16,7 +16,9 @@ import pt.ua.deti.tqs.service.CityService;
 import pt.ua.deti.tqs.service.IAirQualityService;
 
 import java.util.Arrays;
+import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -37,18 +39,20 @@ class AirQualityControllerWithMockServiceTest {
     @MockBean
     private CityService cityService;
     private AirQuality airQuality;
+    private List<AirQuality> airQualityForecast;
     private City city;
     @BeforeEach
     void setUp() {
-        airQuality = new AirQuality(12, Arrays.asList(12,12,12,12,12,12));
-        city = new City("Porto", 12, 12,"Porto, Portugal");
+        airQuality = new AirQuality(12, Arrays.asList(12, 12, 12, 12, 12, 12));
+        city = new City("Porto", 12, 12, "Porto, Portugal");
+        airQualityForecast = Arrays.asList(airQuality, airQuality, airQuality, airQuality, airQuality);
     }
 
     @Test
     void whenGetQualityFromCityThenReturnsAirQuality(){
 
-        when(service.getAirQuality(Mockito.any())).thenReturn(airQuality);
         when(cityService.getCity(Mockito.any())).thenReturn(city);
+        when(service.getAirQuality(Mockito.any())).thenReturn(airQuality);
         try {
             mvc.perform(get("/api/quality?city=Porto")
                     .contentType(MediaType.APPLICATION_JSON))
@@ -67,12 +71,14 @@ class AirQualityControllerWithMockServiceTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        verify(cityService, times(1)).getCity(Mockito.any());
+        verify(service, times(1)).getAirQuality(Mockito.any());
     }
 
     @Test
     void whenGetQualityFromCityThenReturnsError(){
-        when(service.getAirQuality(Mockito.any())).thenReturn(null);
         when(cityService.getCity(Mockito.any())).thenReturn(city);
+        when(service.getAirQuality(Mockito.any())).thenReturn(null);
         try {
             mvc.perform(get("/api/quality?city=Porto")
                     .contentType(MediaType.APPLICATION_JSON))
@@ -81,6 +87,8 @@ class AirQualityControllerWithMockServiceTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        verify(cityService, times(1)).getCity(Mockito.any());
+        verify(service, times(1)).getAirQuality(Mockito.any());
     }
 
     @Test
@@ -89,11 +97,201 @@ class AirQualityControllerWithMockServiceTest {
         when(cityService.getCity(Mockito.any())).thenReturn(null);
         try {
             mvc.perform(get("/api/quality?city=aqwervr")
-                    .contentType(MediaType.APPLICATION_JSON))
+                            .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message", is("It was not possible to retrieve the city data")));
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        verify(cityService, times(1)).getCity(Mockito.any());
+        verify(service, times(0)).getAirQuality(Mockito.any());
+
     }
+
+    @Test
+    void whenGetForecastFromCityThenReturnsAirQuality() {
+        when(cityService.getCity(Mockito.any())).thenReturn(city);
+        when(service.getAirQualityForecast(Mockito.any())).thenReturn(airQualityForecast);
+        try {
+            mvc.perform(get("/api/forecast?city=Porto")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data", hasSize(5)))
+                    .andExpect(jsonPath("$.data[0].aqi", is(12)))
+                    .andExpect(jsonPath("$.data[0].pm10", is(12)))
+                    .andExpect(jsonPath("$.data[0].pm25", is(12)))
+                    .andExpect(jsonPath("$.data[0].no2", is(12)))
+            ;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        verify(cityService, times(1)).getCity(Mockito.any());
+        verify(service, times(1)).getAirQualityForecast(Mockito.any());
+
+    }
+
+    @Test
+    void whenGetForecastFromCityThenReturnsError() {
+        when(cityService.getCity(Mockito.any())).thenReturn(city);
+        when(service.getAirQualityForecast(Mockito.any())).thenReturn(null);
+        try {
+            mvc.perform(get("/api/forecast?city=Porto")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message", is("It was not possible to retrieve the forecast data")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        verify(cityService, times(1)).getCity(Mockito.any());
+        verify(service, times(1)).getAirQualityForecast(Mockito.any());
+    }
+
+    @Test
+    void whenGetForecastFromInvalidCityThenReturnsError() {
+
+        when(service.getAirQualityForecast(Mockito.any())).thenReturn(null);
+        when(cityService.getCity(Mockito.any())).thenReturn(null);
+
+        try {
+            mvc.perform(get("/api/forecast?city=aqwervr")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message", is("It was not possible to retrieve the city data")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        verify(cityService, times(1)).getCity(Mockito.any());
+        verify(service, times(0)).getAirQualityForecast(Mockito.any());
+    }
+
+    @Test
+    void whenGetCityReturnCityData() {
+        when(cityService.getCity(Mockito.any())).thenReturn(city);
+
+        try {
+            mvc.perform(get("/api/city?city=Porto")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.name", is("porto")))
+                    .andExpect(jsonPath("$.displayName", is("Porto, Portugal")))
+                    .andExpect(jsonPath("$.latitude", is(12.0)))
+                    .andExpect(jsonPath("$.longitude", is(12.0)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        verify(cityService, times(1)).getCity(Mockito.any());
+        verify(service, times(0)).getAirQuality(Mockito.any());
+    }
+
+    @Test
+    void whenGetCityFromInvalidCityThenReturnsError() {
+        when(cityService.getCity(Mockito.any())).thenReturn(null);
+
+        try {
+            mvc.perform(get("/api/city?city=aqwervr")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message", is("It was not possible to retrieve the city data")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        verify(cityService, times(1)).getCity(Mockito.any());
+        verify(service, times(0)).getAirQuality(Mockito.any());
+    }
+
+    @Test
+    void whenGetAirQualityFromOpenWeatherThenReturnsAirQuality() {
+        when(cityService.getCity(Mockito.any())).thenReturn(city);
+        when(service.getAirQualityOpenWeather(city.getLatitude(),city.getLongitude())).thenReturn(airQuality);
+        try {
+            mvc.perform(get("/api/openweather?city=Porto")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.aqi", is(12)))
+                    .andExpect(jsonPath("$.data.pm10", is(12)))
+                    .andExpect(jsonPath("$.data.pm25", is(12)))
+                    .andExpect(jsonPath("$.data.no2", is(12)))
+                    .andExpect(jsonPath("$.data.so2", is(12)))
+                    .andExpect(jsonPath("$.data.o3", is(12)))
+                    .andExpect(jsonPath("$.data.co", is(12)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        verify(service, times(1)).getAirQualityOpenWeather(Mockito.any(), Mockito.any());
+        verify(cityService, times(1)).getCity(Mockito.any());
+    }
+
+    @Test
+    void whenGetAirQualityFromOpenWeatherThenReturnsError() {
+        when(cityService.getCity(Mockito.any())).thenReturn(city);
+        when(service.getAirQualityOpenWeather(city.getLatitude(),city.getLongitude())).thenReturn(null);
+        try {
+            mvc.perform(get("/api/openweather?city=Porto")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message", is("It was not possible to retrieve the air quality data")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        verify(service, times(1)).getAirQualityOpenWeather(Mockito.any(), Mockito.any());
+        verify(cityService, times(1)).getCity(Mockito.any());
+    }
+
+    @Test
+    void whenGetAirQualityFromOpenWeatherWithInvalidCityThenReturnsError () {
+        when(cityService.getCity(Mockito.any())).thenReturn(null);
+        when(service.getAirQualityOpenWeather(city.getLatitude(),city.getLongitude())).thenReturn(null);
+
+        try {
+            mvc.perform(get("/api/openweather?city=Porto")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message", is("It was not possible to retrieve the city data")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        verify(service, times(0)).getAirQualityOpenWeather(Mockito.any(), Mockito.any());
+        verify(cityService, times(1)).getCity(Mockito.any());
+    }
+
+    @Test
+    void whenGetAirQualityFromNinjaThenReturnsAirQuality () {
+        when(service.getAirQualityNinja(Mockito.any())).thenReturn(airQuality);
+        try {
+            mvc.perform(get("/api/ninja?city=Porto")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.aqi", is(12)))
+                    .andExpect(jsonPath("$.data.pm10", is(12)))
+                    .andExpect(jsonPath("$.data.pm25", is(12)))
+                    .andExpect(jsonPath("$.data.no2", is(12)))
+                    .andExpect(jsonPath("$.data.so2", is(12)))
+                    .andExpect(jsonPath("$.data.o3", is(12)))
+                    .andExpect(jsonPath("$.data.co", is(12)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        verify(service, times(1)).getAirQualityNinja(Mockito.any());
+        verify(cityService, times(1)).getCity(Mockito.any());
+    }
+
+    @Test
+    void whenGetAirQualityFromNinjaThenReturnsError() {
+        when(service.getAirQualityNinja(Mockito.any())).thenReturn(null);
+        try {
+            mvc.perform(get("/api/ninja?city=Porto")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message", is("It was not possible to retrieve the air quality data")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        verify(service, times(1)).getAirQualityNinja(Mockito.any());
+        verify(cityService, times(0)).getCity(Mockito.any());
+    }
+
 }

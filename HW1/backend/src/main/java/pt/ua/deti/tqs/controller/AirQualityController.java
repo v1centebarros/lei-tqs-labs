@@ -56,10 +56,10 @@ public class AirQualityController {
         }
         List<AirQuality> airQualityForecast = airQualityService.getAirQualityForecast(cityData);
 
-        if (airQualityForecast.equals(Collections.emptyList())){
+        if (airQualityForecast == null || airQualityForecast.equals(Collections.emptyList())){
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(APPLICATION_JSON)
-                    .body(new ErrorDTO("It was not possible to retrieve the forecast"));
+                    .body(new ErrorDTO("It was not possible to retrieve the forecast data"));
         }
 
         return ResponseEntity.ok(new ForecastDTO(cityData, airQualityForecast));
@@ -90,6 +90,11 @@ public class AirQualityController {
 
         AirQuality airQuality = airQualityService.getAirQualityOpenWeather(cityData.getLatitude(), cityData.getLongitude());
 
+        if (airQuality == null) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(APPLICATION_JSON)
+                    .body(new ErrorDTO("It was not possible to retrieve the air quality data"));
+        }
         return ResponseEntity.ok(new AirQualityDTO(cityData, airQuality));
     }
 
