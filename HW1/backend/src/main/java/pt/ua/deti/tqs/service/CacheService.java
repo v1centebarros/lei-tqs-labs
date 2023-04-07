@@ -11,8 +11,6 @@ import java.util.List;
 public class CacheService {
 
     private final LocalVolatileCache<City, AirQuality> airQualityCache = new LocalVolatileCache<>();
-
-
     private final LocalVolatileCache<City, List<AirQuality>> airQualityForecastCache = new LocalVolatileCache<>();
 
     public boolean hasCityQuality(City city) {

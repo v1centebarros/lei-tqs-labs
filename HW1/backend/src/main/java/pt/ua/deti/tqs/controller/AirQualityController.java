@@ -101,5 +101,4 @@ public class AirQualityController {
         }
         return ResponseEntity.ok(airQualityService.getAirQualityNinja(city));
     }
-
 }

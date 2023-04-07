@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import pt.ua.deti.tqs.cache.CacheStats;
 import pt.ua.deti.tqs.data.AirQuality;
 import pt.ua.deti.tqs.data.City;
 import reactor.core.publisher.Mono;
@@ -23,17 +24,22 @@ public class AirQualityService implements IAirQualityService {
     @Autowired
     private CacheService cacheService;
 
+    private final CacheStats airQualityCacheStats = new CacheStats();
+    private final CacheStats airQualityForecastCacheStats = new CacheStats();
+
     @Override
     public AirQuality getAirQuality(City city) {
         AirQuality airQuality;
         log.info("Requesting city {} from Cache", city);
         if (cacheService.hasCityQuality(city)) {
             airQuality = cacheService.getAirQuality(city);
+            airQualityCacheStats.hit();
             log.info("City found in cache {} with {}", city, airQuality);
             return airQuality;
         }
 
         log.info("{} not found in cache retrieving from NinjaAPI", city);
+        airQualityCacheStats.miss();
         airQuality = getAirQualityNinja(city.getName());
 
         if (airQuality == null) {
@@ -48,6 +54,7 @@ public class AirQualityService implements IAirQualityService {
 
         log.info("Caching {} current data", airQuality);
         cacheService.addAirQuality(city, airQuality);
+        airQualityCacheStats.put();
         return airQuality;
     }
 
@@ -100,10 +107,12 @@ public class AirQualityService implements IAirQualityService {
         if (cacheService.hasCityForecast(city)) {
             List<AirQuality> airQualityList = cacheService.getAirQualityForecast(city);
             log.info("City found in cache {} with {}", city, airQualityList);
+            airQualityForecastCacheStats.hit();
             return airQualityList;
         }
 
         log.info("{} not found in cache retrieving from OpenWeather", city);
+        airQualityForecastCacheStats.miss();
         List<AirQuality> airQualityList = fetchAirQualityForecast(city);
 
         if (airQualityList == null) {
@@ -113,6 +122,7 @@ public class AirQualityService implements IAirQualityService {
         log.info("City fetched from OpenWeather {} with {}", city, airQualityList);
         log.info("Caching {} forecast data", airQualityList);
         cacheService.addAirQualityForecast(city, airQualityList);
+        airQualityForecastCacheStats.put();
         return airQualityList;
     }
 
@@ -142,5 +152,13 @@ public class AirQualityService implements IAirQualityService {
        }
 
         return airQualityList;
+    }
+
+    public CacheStats getAirQualityCacheStats() {
+        return airQualityCacheStats;
+    }
+
+    public CacheStats getAirQualityForecastCacheStats() {
+        return airQualityForecastCacheStats;
     }
 }
