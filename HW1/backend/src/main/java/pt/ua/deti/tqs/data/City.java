@@ -3,7 +3,6 @@ package pt.ua.deti.tqs.data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -32,10 +31,6 @@ public class City {
     @Override
     public int hashCode() {
         return Objects.hash(name, latitude, longitude, displayName);
-    }
-
-    public List<Number> getCoordinates() {
-        return List.of(latitude, longitude);
     }
 
     @Override

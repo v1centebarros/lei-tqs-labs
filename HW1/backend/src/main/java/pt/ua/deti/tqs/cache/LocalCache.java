@@ -1,11 +1,8 @@
 package pt.ua.deti.tqs.cache;
 
-import org.springframework.stereotype.Component;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
 public class LocalCache<K, V> implements ILocalCache<K, V> {
 
     private final Map<K, V> cache;

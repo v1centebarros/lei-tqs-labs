@@ -55,7 +55,6 @@ class VolatileCacheTest {
     void testGetCacheWithExpiredEntry() {
         cache.put("key1", 1234, 1);
         cache.put("key2", 5678, 10);
-//        Thread.sleep(3000);
         await().atMost(3, TimeUnit.SECONDS);
         assertEquals(2, cache.size());
     }
