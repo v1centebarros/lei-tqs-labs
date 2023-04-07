@@ -1,14 +1,29 @@
 export type AirQuality = {
-    overallAqi: number,
-    CO : Measurement,
-    PM10 : Measurement,
-    SO2 : Measurement,
-    PM25 : Measurement,
-    O3 : Measurement,
-    NO2 : Measurement
+    aqi: number,
+    co: number
+    pm10: number,
+    so2: number,
+    pm25: number,
+    o3: number,
+    no2: number,
+    dateTime: string
 }
 
-type Measurement = {
-    concentration: number,
-    aqi: number
+export type City = {
+    name: string,
+    latitude: number,
+    longitude: number,
+    displayName: string,
+    coordinates: []
+}
+
+
+export type AirQualityForecast = {
+    city: City,
+    data: AirQuality[]
+}
+
+export type CurrentAirQuality = {
+    city: City,
+    data: AirQuality
 }
