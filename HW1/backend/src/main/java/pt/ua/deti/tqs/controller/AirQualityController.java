@@ -90,6 +90,12 @@ public class AirQualityController {
         }
         City cityData = cityService.getCity(city);
 
+        if (cityData == null) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(APPLICATION_JSON)
+                    .body(new ErrorDTO("It was not possible to retrieve the city data"));
+        }
+
         AirQuality airQuality = airQualityService.getAirQualityOpenWeather(cityData.getLatitude(), cityData.getLongitude());
 
 
