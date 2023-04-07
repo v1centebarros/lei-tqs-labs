@@ -119,7 +119,7 @@ public class AirQualityService implements IAirQualityService {
             log.error("Could not retrieve data for {}", city);
             return Collections.emptyList();
         }
-        log.info("City fetched from OpenWeather {} with {}", city, airQualityList);
+        log.info("City fetched from OpenWeather {} with {} entries", city, airQualityList.size());
         log.info("Caching {} forecast data", airQualityList);
         cacheService.addAirQualityForecast(city, airQualityList);
         airQualityForecastCacheStats.put();
