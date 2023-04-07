@@ -1,6 +1,5 @@
 package pt.ua.deti.tqs.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pt.ua.deti.tqs.cache.LocalVolatileCache;
 import pt.ua.deti.tqs.data.AirQuality;
@@ -11,11 +10,10 @@ import java.util.List;
 @Service
 public class CacheService {
 
-    @Autowired
-    private LocalVolatileCache<City, AirQuality> airQualityCache;
+    private final LocalVolatileCache<City, AirQuality> airQualityCache = new LocalVolatileCache<>();
 
-    @Autowired
-    private LocalVolatileCache<City, List<AirQuality>> airQualityForecastCache;
+
+    private final LocalVolatileCache<City, List<AirQuality>> airQualityForecastCache = new LocalVolatileCache<>();
 
     public boolean hasCityQuality(City city) {
         return airQualityCache.containsKey(city);

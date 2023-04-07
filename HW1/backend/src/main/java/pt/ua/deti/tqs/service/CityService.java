@@ -45,6 +45,7 @@ public class CityService {
         city = city.trim().toLowerCase();
         log.info("Requesting city {} from Cache", city);
         if (cities.containsKey(city)) {
+            log.info("City found in cache {}", city);
             return cities.get(city);
         }
 

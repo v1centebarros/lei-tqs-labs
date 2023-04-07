@@ -2,13 +2,12 @@ package pt.ua.deti.tqs.cache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
+
 public class LocalVolatileCache<K, V> implements ILocalCache<K, V>{
 
     private final Map<K, CacheEntry<V>> cache;
