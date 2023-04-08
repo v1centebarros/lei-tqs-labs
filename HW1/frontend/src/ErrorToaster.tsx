@@ -9,12 +9,16 @@ export function ErrorToaster(props: { errorText: string, setError: (value: boole
     }, 3000);
 
 
-    return show && (
-        <div className="toast toast-end">
-            <div className="alert alert-error">
-                <div>
-                    <span>{props.errorText}</span>
+    return (
+    <>
+        {show && (
+            <div className="toast toast-end">
+                <div className="alert alert-error">
+                    <div>
+                        <span>{props.errorText}</span>
+                    </div>
                 </div>
             </div>
-        </div>);
+        )}
+    </>);
 }

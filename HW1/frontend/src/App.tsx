@@ -16,7 +16,7 @@ function App() {
     const [loadTime, setLoadTime] = useState(0)
     const [errorText, setErrorText] = useState('')
     const [option, setOption] = useState('Current')
-    const findAirQuality = async (url) => {
+    const findAirQuality = async (url:string) => {
         if (city.length < 3) {
             setError(true)
             setErrorText('Please enter a valid city name')
@@ -123,7 +123,7 @@ function App() {
                 <select className="select select-primary w-1/6 rounded-full"
                         onChange={(event) => changeOption(event.target.value)}
                 >
-                    <option defaultValue>Current</option>
+                    <option>Current</option>
                     <option>Forecast</option>
                     <option>NinjaAPI</option>
                     <option>OpenWeatherAPI</option>
