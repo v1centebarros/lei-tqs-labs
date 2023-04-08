@@ -117,6 +117,6 @@ public class AirQualityController {
                     .body(new ErrorDTO("It was not possible to retrieve the air quality data"));
         }
 
-        return ResponseEntity.ok(new AirQualityDTO(cityService.getCity(city), airQuality));
+        return ResponseEntity.ok(new AirQualityDTO(cityData, airQuality));
     }
 }

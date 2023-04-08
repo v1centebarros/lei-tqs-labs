@@ -277,7 +277,7 @@ class AirQualityControllerWithMockServiceTest {
             e.printStackTrace();
         }
         verify(service, times(1)).getFromNinja(Mockito.any());
-        verify(cityService, times(0)).getCity(Mockito.any());
+        verify(cityService, times(1)).getCity(Mockito.any());
     }
 
     @Test
@@ -293,7 +293,24 @@ class AirQualityControllerWithMockServiceTest {
             e.printStackTrace();
         }
         verify(service, times(1)).getFromNinja(Mockito.any());
-        verify(cityService, times(0)).getCity(Mockito.any());
+        verify(cityService, times(1)).getCity(Mockito.any());
+    }
+
+    @Test
+    void whenGetAirQualityFromNinjaFromInvalidCityThenReturnsError() {
+        when(cityService.getCity(Mockito.any())).thenReturn(null);
+        when(service.getFromNinja(city)).thenReturn(null);
+
+        try {
+            mvc.perform(get("/api/ninja?city=asdsadsasd")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message", is("It was not possible to retrieve the city data")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        verify(service, times(0)).getFromNinja(Mockito.any());
+        verify(cityService, times(1)).getCity(Mockito.any());
     }
 
 }

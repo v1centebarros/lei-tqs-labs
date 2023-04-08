@@ -15,17 +15,16 @@ import java.util.List;
 @Service
 public class AirQualityService {
     static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    private CacheService cacheService;
-
     private final CacheStats airQualityCacheStats = new CacheStats();
     private final CacheStats airQualityForecastCacheStats = new CacheStats();
-
+    private CacheService cacheService;
     private ApiQuality[] apis;
+
     public AirQualityService(ApiQuality[] apiQualities, CacheService cacheService) {
         this.apis = apiQualities;
         this.cacheService = cacheService;
     }
+
     public AirQuality getAirQuality(City city) {
         AirQuality airQuality;
         log.info("Requesting city {} from Cache", city);
