@@ -11,9 +11,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import pt.ua.deti.tqs.controller.AirQualityController;
 import pt.ua.deti.tqs.data.AirQuality;
 import pt.ua.deti.tqs.data.City;
+import pt.ua.deti.tqs.service.AirQualityService;
 import pt.ua.deti.tqs.service.CacheService;
 import pt.ua.deti.tqs.service.CityService;
-import pt.ua.deti.tqs.service.IAirQualityService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +31,7 @@ class AirQualityControllerWithMockServiceTest {
     private MockMvc mvc;
 
     @MockBean
-    private IAirQualityService service;
+    private AirQualityService service;
 
     @MockBean
     private CacheService cacheService;
@@ -206,7 +206,7 @@ class AirQualityControllerWithMockServiceTest {
     @Test
     void whenGetAirQualityFromOpenWeatherThenReturnsAirQuality() {
         when(cityService.getCity(Mockito.any())).thenReturn(city);
-        when(service.getAirQualityOpenWeather(city.getLatitude(),city.getLongitude())).thenReturn(airQuality);
+        when(service.getFromOpenWeather(city)).thenReturn(airQuality);
         try {
             mvc.perform(get("/api/openweather?city=Porto")
                             .contentType(MediaType.APPLICATION_JSON))
@@ -221,14 +221,14 @@ class AirQualityControllerWithMockServiceTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        verify(service, times(1)).getAirQualityOpenWeather(Mockito.any(), Mockito.any());
+        verify(service, times(1)).getFromOpenWeather(Mockito.any());
         verify(cityService, times(1)).getCity(Mockito.any());
     }
 
     @Test
     void whenGetAirQualityFromOpenWeatherThenReturnsError() {
         when(cityService.getCity(Mockito.any())).thenReturn(city);
-        when(service.getAirQualityOpenWeather(city.getLatitude(),city.getLongitude())).thenReturn(null);
+        when(service.getFromOpenWeather(city)).thenReturn(null);
         try {
             mvc.perform(get("/api/openweather?city=Porto")
                             .contentType(MediaType.APPLICATION_JSON))
@@ -237,14 +237,14 @@ class AirQualityControllerWithMockServiceTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        verify(service, times(1)).getAirQualityOpenWeather(Mockito.any(), Mockito.any());
+        verify(service, times(1)).getFromOpenWeather(Mockito.any());
         verify(cityService, times(1)).getCity(Mockito.any());
     }
 
     @Test
     void whenGetAirQualityFromOpenWeatherWithInvalidCityThenReturnsError () {
         when(cityService.getCity(Mockito.any())).thenReturn(null);
-        when(service.getAirQualityOpenWeather(city.getLatitude(),city.getLongitude())).thenReturn(null);
+        when(service.getFromOpenWeather(city)).thenReturn(null);
 
         try {
             mvc.perform(get("/api/openweather?city=Porto")
@@ -254,13 +254,14 @@ class AirQualityControllerWithMockServiceTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        verify(service, times(0)).getAirQualityOpenWeather(Mockito.any(), Mockito.any());
+        verify(service, times(0)).getFromOpenWeather(Mockito.any());
         verify(cityService, times(1)).getCity(Mockito.any());
     }
 
     @Test
     void whenGetAirQualityFromNinjaThenReturnsAirQuality () {
-        when(service.getAirQualityNinja(Mockito.any())).thenReturn(airQuality);
+        when(service.getFromNinja(city)).thenReturn(airQuality);
+        when(cityService.getCity(Mockito.any())).thenReturn(city);
         try {
             mvc.perform(get("/api/ninja?city=Porto")
                             .contentType(MediaType.APPLICATION_JSON))
@@ -275,13 +276,14 @@ class AirQualityControllerWithMockServiceTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        verify(service, times(1)).getAirQualityNinja(Mockito.any());
-        verify(cityService, times(1)).getCity(Mockito.any());
+        verify(service, times(1)).getFromNinja(Mockito.any());
+        verify(cityService, times(0)).getCity(Mockito.any());
     }
 
     @Test
     void whenGetAirQualityFromNinjaThenReturnsError() {
-        when(service.getAirQualityNinja(Mockito.any())).thenReturn(null);
+        when(service.getFromNinja(city)).thenReturn(null);
+        when(cityService.getCity(Mockito.any())).thenReturn(city);
         try {
             mvc.perform(get("/api/ninja?city=Porto")
                             .contentType(MediaType.APPLICATION_JSON))
@@ -290,7 +292,7 @@ class AirQualityControllerWithMockServiceTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        verify(service, times(1)).getAirQualityNinja(Mockito.any());
+        verify(service, times(1)).getFromNinja(Mockito.any());
         verify(cityService, times(0)).getCity(Mockito.any());
     }
 

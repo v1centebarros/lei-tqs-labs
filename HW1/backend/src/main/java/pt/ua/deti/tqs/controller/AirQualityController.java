@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pt.ua.deti.tqs.data.*;
+import pt.ua.deti.tqs.service.AirQualityService;
 import pt.ua.deti.tqs.service.CityService;
-import pt.ua.deti.tqs.service.IAirQualityService;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +21,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 public class AirQualityController {
 
     @Autowired
-    private IAirQualityService airQualityService;
+    private AirQualityService airQualityService;
 
     @Autowired
     private CityService cityService;
@@ -88,7 +88,7 @@ public class AirQualityController {
                     .body(new ErrorDTO("It was not possible to retrieve the city data"));
         }
 
-        AirQuality airQuality = airQualityService.getAirQualityOpenWeather(cityData.getLatitude(), cityData.getLongitude());
+        AirQuality airQuality = airQualityService.getFromOpenWeather(cityData);
 
         if (airQuality == null) {
             return ResponseEntity.status(HttpStatus.OK)
@@ -100,7 +100,16 @@ public class AirQualityController {
 
     @GetMapping("/ninja")
     public ResponseEntity<Object> getNinja(@RequestParam(value = "city") String city) {
-        AirQuality airQuality = airQualityService.getAirQualityNinja(city);
+
+        City cityData = cityService.getCity(city);
+
+        if (cityData == null) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(APPLICATION_JSON)
+                    .body(new ErrorDTO("It was not possible to retrieve the city data"));
+        }
+
+        AirQuality airQuality = airQualityService.getFromNinja(cityData);
 
         if (airQuality == null) {
             return ResponseEntity.status(HttpStatus.OK)
