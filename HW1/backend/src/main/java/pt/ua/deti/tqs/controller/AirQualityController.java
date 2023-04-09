@@ -3,10 +3,7 @@ package pt.ua.deti.tqs.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pt.ua.deti.tqs.data.*;
 import pt.ua.deti.tqs.service.AirQualityService;
 import pt.ua.deti.tqs.service.CityService;
@@ -17,6 +14,7 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api")
 public class AirQualityController {
 
@@ -26,6 +24,10 @@ public class AirQualityController {
     @Autowired
     private CityService cityService;
 
+    private static final ErrorDTO AQ_ERROR = new ErrorDTO("It was not possible to retrieve the air quality data");
+
+    private static final ErrorDTO CITY_ERROR = new ErrorDTO("It was not possible to retrieve the city data");
+
     @GetMapping("/quality")
     public ResponseEntity<Object> getQuality(@RequestParam(value = "city") String city) {
         City cityData = cityService.getCity(city);
@@ -33,14 +35,14 @@ public class AirQualityController {
         if (cityData == null) {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(APPLICATION_JSON)
-                    .body(new ErrorDTO("It was not possible to retrieve the city data"));
+                    .body(CITY_ERROR);
         }
 
         AirQuality airQuality = airQualityService.getAirQuality(cityData);
         if (airQuality == null) {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(APPLICATION_JSON)
-                    .body(new ErrorDTO("It was not possible to retrieve the air quality data"));
+                    .body(AQ_ERROR);
         }
 
         return ResponseEntity.ok(new AirQualityDTO(cityData, airQuality));
@@ -52,7 +54,7 @@ public class AirQualityController {
         if (cityData == null) {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(APPLICATION_JSON)
-                    .body(new ErrorDTO("It was not possible to retrieve the city data"));
+                    .body(CITY_ERROR);
         }
         List<AirQuality> airQualityForecast = airQualityService.getAirQualityForecast(cityData);
 
@@ -72,7 +74,7 @@ public class AirQualityController {
         if (cityData == null) {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(APPLICATION_JSON)
-                    .body(new ErrorDTO("It was not possible to retrieve the city data"));
+                    .body(CITY_ERROR);
         }
 
         return ResponseEntity.ok(cityData);
@@ -85,7 +87,7 @@ public class AirQualityController {
         if (cityData == null) {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(APPLICATION_JSON)
-                    .body(new ErrorDTO("It was not possible to retrieve the city data"));
+                    .body(CITY_ERROR);
         }
 
         AirQuality airQuality = airQualityService.getFromOpenWeather(cityData);
@@ -93,7 +95,7 @@ public class AirQualityController {
         if (airQuality == null) {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(APPLICATION_JSON)
-                    .body(new ErrorDTO("It was not possible to retrieve the air quality data"));
+                    .body(AQ_ERROR);
         }
         return ResponseEntity.ok(new AirQualityDTO(cityData, airQuality));
     }
@@ -106,7 +108,7 @@ public class AirQualityController {
         if (cityData == null) {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(APPLICATION_JSON)
-                    .body(new ErrorDTO("It was not possible to retrieve the city data"));
+                    .body(CITY_ERROR);
         }
 
         AirQuality airQuality = airQualityService.getFromNinja(cityData);
@@ -114,7 +116,7 @@ public class AirQualityController {
         if (airQuality == null) {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(APPLICATION_JSON)
-                    .body(new ErrorDTO("It was not possible to retrieve the air quality data"));
+                    .body(AQ_ERROR);
         }
 
         return ResponseEntity.ok(new AirQualityDTO(cityData, airQuality));

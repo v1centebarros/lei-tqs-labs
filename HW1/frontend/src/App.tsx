@@ -111,8 +111,8 @@ function App() {
 
     return (
         <div className='p-3 bg-base-100 h-screen'>
-            <div className="navbar bg-base-300 rounded-full">
-                <div className={"flex-1"}>
+            <div className="navbar bg-base-300 rounded-full" id={"navbar"}>
+                <div className={"flex-1"} id={"logo"}>
                     <a className="btn btn-ghost normal-case text-xl rounded-full"><img src={"./logo.png"} className={"h-full"}/>💨</a>
                 </div>
                 <div className={"flex-none"}>
@@ -121,6 +121,7 @@ function App() {
             </div>
             <div className={'flex flex-row items-center justify-center my-4 space-x-4'}>
                 <select className="select select-primary w-1/6 rounded-full"
+                        id={"selectOption"}
                         onChange={(event) => changeOption(event.target.value)}
                 >
                     <option>Current</option>
@@ -132,11 +133,13 @@ function App() {
 
                 {option !== 'Statistics' && (
                     <input type="text" placeholder="Enter City"
+                           id={"cityInput"}
                            className="input input-bordered input-primary w-1/4 rounded-full"
                            onChange={(event) => setCity(event.target.value)}
                     />
                 )}
                 <button className={`btn ${loading && "loading"} btn-primary rounded-full w-1/5`}
+                        id={"submitBtn"}
                         onClick={() => requestData()}>
                     {loading ? "Loading..." : option === "Statistics" ? "Check Statistics" : "Find Air Quality"}
                 </button>
@@ -147,11 +150,11 @@ function App() {
                 {!loading && !error && airQuality && (
                     <div className={"space-y-4"}>
                         <div className={"flex flex-row content-center items-end space-x-2"}>
-                            <div className={"text-4xl font-bold"}>{airQuality.city.displayName}</div>
+                            <div className={"text-4xl font-bold"} id={"displayName"}>{airQuality.city.displayName}</div>
                             <div
-                                className={"text-2xl font-extralight flex-1"}>({airQuality.city.latitude},{airQuality.city.longitude})
+                                className={"text-2xl font-extralight flex-1"} id={"coordinates"}>({airQuality.city.latitude},{airQuality.city.longitude})
                             </div>
-                            <div><span className={"text-2xl font-bold"}>Load Time:</span> <span
+                            <div id={"loadTime"}><span className={"text-2xl font-bold"}>Load Time:</span> <span
                                 className={"text-2xl font-extralight"}> {loadTime}ms</span></div>
                         </div>
                         {(option === 'Current' || option === 'NinjaAPI' || option === 'OpenWeatherAPI') && (
