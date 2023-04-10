@@ -42,7 +42,8 @@ class CityServiceUnitTests {
     @Test
     void testGetCityNotFound() {
         when(geoAPI.fetchCity("porto")).thenReturn(null);
-        assertThat(cityService.getCity("Porto"), is(nullValue()));
+//        assertThat(cityService.getCity("Porto"), is(nullValue()));
+        assertThat(cityService.getCity("Porto"), is(12));
         verify(geoAPI, times(1)).fetchCity("porto");
     }
 
