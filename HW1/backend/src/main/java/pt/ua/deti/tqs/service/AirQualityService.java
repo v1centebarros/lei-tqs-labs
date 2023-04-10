@@ -17,6 +17,8 @@ public class AirQualityService {
     static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final CacheStats airQualityCacheStats = new CacheStats();
     private final CacheStats airQualityForecastCacheStats = new CacheStats();
+    
+    private static final String REQUESTING_CITY_FROM_API = "Requesting city {} from API {}";
     private CacheService cacheService;
     private ApiQuality[] apis;
 
@@ -38,7 +40,7 @@ public class AirQualityService {
         airQualityCacheStats.miss();
 
         for (ApiQuality api : apis) {
-            log.info("Requesting city {} from API {}", city, api.getApiName());
+            log.info(REQUESTING_CITY_FROM_API, city, api.getApiName());
             airQuality = api.getQuality(city);
             if (airQuality != null) {
                 log.info("Caching {} current data", airQuality);
@@ -59,7 +61,7 @@ public class AirQualityService {
         }
         airQualityForecastCacheStats.miss();
         for (ApiQuality api : apis) {
-            log.info("Requesting city {} from API {}", city, api.getApiName());
+            log.info(REQUESTING_CITY_FROM_API, city, api.getApiName());
             List<AirQuality> airQualityList = api.getForecast(city);
             if (!airQualityList.isEmpty()) {
                 log.info("Caching {} forecast data", airQualityList);
@@ -75,7 +77,7 @@ public class AirQualityService {
     public AirQuality getFromNinja(City city) {
         for (ApiQuality api : apis) {
             if (api.getApiName().equals("NinjaAPI")) {
-                log.info("Requesting city {} from API {}", city, api.getApiName());
+                log.info(REQUESTING_CITY_FROM_API, city, api.getApiName());
                 return api.getQuality(city);
             }
         }
@@ -85,7 +87,7 @@ public class AirQualityService {
     public AirQuality getFromOpenWeather(City city) {
         for (ApiQuality api : apis) {
             if (api.getApiName().equals("OpenWeatherAPI")) {
-                log.info("Requesting city {} from API {}", city, api.getApiName());
+                log.info(REQUESTING_CITY_FROM_API, city, api.getApiName());
                 return api.getQuality(city);
             }
         }
