@@ -11,7 +11,7 @@ import pt.ua.deti.tqs.data.CacheStatsDTO;
 import pt.ua.deti.tqs.service.AirQualityService;
 
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping("/api")
 public class CacheStatsController {
 
