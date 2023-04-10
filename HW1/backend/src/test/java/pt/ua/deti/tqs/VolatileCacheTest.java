@@ -33,7 +33,6 @@ class VolatileCacheTest {
     @Test
     void testGetWithExpiredEntry() {
         cache.put("key", 1234, 1);
-        //TODO: Rever isto
         await().atMost(10, TimeUnit.SECONDS).until(() -> cache.get("key") == null);
         assertNull(cache.get("key"));
     }
