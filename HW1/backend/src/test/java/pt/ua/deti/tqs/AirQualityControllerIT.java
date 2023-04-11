@@ -54,7 +54,7 @@ class AirQualityControllerIT {
                 .body("city.displayName", is("Porto, Portugal"))
                 .body("city.latitude", is(41.149452F))
                 .body("city.longitude", is(-8.610788F))
-                .body("data", hasSize(95))
+                .body("data", hasSize(96))
                 .body("data[0].aqi", is(instanceOf(Number.class)))
                 .body("data[0].pm10", is(instanceOf(Number.class)))
                 .body("data[0].pm25", is(instanceOf(Number.class)))

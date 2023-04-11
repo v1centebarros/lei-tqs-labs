@@ -47,7 +47,7 @@ class OpenWeatherAPIUnitTests {
     void testFetchGetForecast() {
         List<AirQuality> forecast = api.getForecast(c);
 
-        assertThat(forecast).hasSize(95);
+        assertThat(forecast).hasSize(96);
         assertThat(forecast.get(0).getAqi()).isInstanceOf(Integer.class);
         assertThat(forecast.get(0).getCo()).isInstanceOf(Number.class);
         assertThat(forecast.get(0).getNo2()).isInstanceOf(Number.class);

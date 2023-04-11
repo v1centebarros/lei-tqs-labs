@@ -47,7 +47,7 @@ class SeleniumTestIT {
 
         wait.until(webDriver -> homePage.getDisplayName().equals("Porto, Portugal"));
         wait.until(webDriver -> homePage.getCoordinates().equals("(41.1494512,-8.6107884)"));
-        assertThat(homePage.getForecastEntries()).contains("95 Forecast Entries");
+        assertThat(homePage.getForecastEntries()).contains("96 Forecast Entries");
 
         assertThat(homePage.getLoadMoreBtn()).isEqualTo("LOAD MORE");
         homePage.loadMore();
